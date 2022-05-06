@@ -1,0 +1,15 @@
+--- !ruby/object:Game
+secret_word: sync
+secret_word_array:
+- s
+- y
+- n
+- c
+guess_word_array:
+- _
+- _
+- _
+- _
+guess_word: _ _ _ _
+guesses_left: 10
+wrong_letters: []

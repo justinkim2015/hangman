@@ -1,0 +1,25 @@
+--- !ruby/object:Game
+secret_word: substance
+secret_word_array:
+- s
+- u
+- b
+- s
+- t
+- a
+- n
+- c
+- e
+guess_word_array:
+- _
+- _
+- _
+- _
+- _
+- _
+- _
+- _
+- _
+guess_word: _ _ _ _ _ _ _ _ _
+guesses_left: 10
+wrong_letters: []

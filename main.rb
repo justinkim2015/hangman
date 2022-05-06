@@ -1,4 +1,5 @@
 require 'colorize'
+require 'yaml'
 
 # This module contains all text
 module Text
@@ -29,6 +30,24 @@ module Text
     puts 'INVALID INPUT, TRY AGAIN'.colorize(:red)
     print "\n"
   end
+
+  def overwrite_text
+    print "\n"
+    puts 'That file exists, overwrite?'.colorize(:red)
+    print "\n"
+  end
+
+  def choose_name_text
+    print "\n"
+    puts 'What would you like to name your save?'.bold
+    print "\n"
+  end
+
+  def choose_file_text
+    print "\n"
+    puts 'Which file would you like to load?(case sensitive)'.bold
+    print "\n"
+  end
 end
 
 # This module contains methods to display game
@@ -48,10 +67,93 @@ module Board
   end
 end
 
+# This module contains methods to save and load game
+module SaveGame
+  def serialize
+    YAML.dump(self)
+  end
+
+  def self.deserialize(yaml)
+    YAML.load(yaml)
+  end
+
+  def save_file(file_name)
+    File.open("/home/justin/hangman/saves/#{file_name}", 'w') { |file| file.puts serialize }
+  end
+
+  def load_file(file_name)
+    game_file = File.open("/home/justin/hangman/saves/#{file_name}", 'r')
+    yaml = game_file.read
+    YAML.load(yaml)
+    SaveGame.deserialize(yaml)
+  end
+
+  def overwrite?
+    overwrite_text
+    answer = gets.downcase.chomp
+    case answer
+    when 'yes'
+      true
+    when 'no'
+      false
+    else
+      overwrite?
+    end
+  end
+
+  def choose_name
+    choose_name_text
+    display_saves
+    name = "#{gets.chomp}.txt"
+    if valid_file?(name)
+      name
+    elsif overwrite?
+      name
+    else
+      choose_name
+    end
+  end
+
+  def choose_file
+    choose_file_text
+    display_saves
+    name = "#{gets.chomp}.txt"
+    if valid_file?(name)
+      name
+    else
+      puts 'INVALID FILE NAME'
+      choose_file
+    end
+  end
+
+  def valid_file?(file)
+    true unless current_saves.include?(file)
+  end
+
+  def current_saves
+    Dir.entries('saves').select { |f| File.file? File.join('saves', f) }
+  end
+
+  def display_saves
+    saves = current_saves
+    puts saves
+    print "\n"
+  end
+
+  def load
+    load_file(choose_file)
+  end
+
+  def save
+    save_file(choose_name)
+  end
+end
+
 # This class contains game logic and error checking
 class Game
   include Text
   include Board
+  include SaveGame
 
   attr_accessor :secret_word, :guess_word
 
@@ -139,4 +241,5 @@ class Game
 end
 
 game = Game.new
-game.play_game
+game.save
+# game = game.load

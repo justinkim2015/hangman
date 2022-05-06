@@ -1,0 +1,19 @@
+--- !ruby/object:Game
+secret_word: arabia
+secret_word_array:
+- a
+- r
+- a
+- b
+- i
+- a
+guess_word_array:
+- _
+- _
+- _
+- _
+- _
+- _
+guess_word: _ _ _ _ _ _
+guesses_left: 10
+wrong_letters: []
