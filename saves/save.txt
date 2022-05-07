@@ -1,0 +1,26 @@
+--- !ruby/object:Game
+secret_word: melbourne
+secret_word_array:
+- m
+- e
+- l
+- b
+- o
+- u
+- r
+- n
+- e
+guess_word_array:
+- _
+- e
+- _
+- _
+- _
+- _
+- _
+- _
+- e
+guess_word: _e______e
+guesses_left: 9
+wrong_letters:
+- y

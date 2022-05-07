@@ -1,15 +1,23 @@
 --- !ruby/object:Game
-secret_word: sync
+secret_word: solving
 secret_word_array:
 - s
-- y
+- o
+- l
+- v
+- i
 - n
-- c
+- g
 guess_word_array:
 - _
 - _
+- l
+- _
+- i
 - _
 - _
-guess_word: _ _ _ _
-guesses_left: 10
-wrong_letters: []
+guess_word: __l_i__
+guesses_left: 8
+wrong_letters:
+- e
+- j

@@ -1,15 +1,15 @@
 --- !ruby/object:Game
-secret_word: louisiana
+secret_word: developed
 secret_word_array:
+- d
+- e
+- v
+- e
 - l
 - o
-- u
-- i
-- s
-- i
-- a
-- n
-- a
+- p
+- e
+- d
 guess_word_array:
 - _
 - _

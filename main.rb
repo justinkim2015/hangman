@@ -4,12 +4,12 @@ require 'yaml'
 # This module contains all text
 module Text
   def line_break
-    print "---------------\n"
+    print "------------------------------\n"
   end
 
   def input_please_text
     line_break
-    puts 'Input a letter!'.bold
+    puts 'Input a letter or type "save"!'.bold
     line_break
   end
 
@@ -33,17 +33,17 @@ module Text
 
   def overwrite_text
     print "\n"
-    puts 'That file exists, overwrite?'.colorize(:red)
+    puts 'That file exists, overwrite?(y/n)'.colorize(:red)
     print "\n"
   end
 
-  def choose_name_text
+  def save_name_text
     print "\n"
     puts 'What would you like to name your save?'.bold
     print "\n"
   end
 
-  def choose_file_text
+  def load_name_text
     print "\n"
     puts 'Which file would you like to load?(case sensitive)'.bold
     print "\n"
@@ -77,8 +77,20 @@ module SaveGame
     YAML.load(yaml)
   end
 
-  def save_file(file_name)
-    File.open("/home/justin/hangman/saves/#{file_name}", 'w') { |file| file.puts serialize }
+  def load
+    load_file(load_name)
+  end
+
+  def load_name
+    load_name_text
+    display_saves
+    name = "#{gets.chomp}.txt"
+    if !no_repeat?(name)
+      name
+    else
+      puts 'INVALID FILE NAME'
+      load_name
+    end
   end
 
   def load_file(file_name)
@@ -88,45 +100,60 @@ module SaveGame
     SaveGame.deserialize(yaml)
   end
 
+  def save
+    save_file(save_name)
+  end
+
+  def save_file(file_name)
+    File.open("/home/justin/hangman/saves/#{file_name}", 'w') { |file| file.puts serialize }
+  end
+
   def overwrite?
     overwrite_text
     answer = gets.downcase.chomp
     case answer
-    when 'yes'
+    when 'y'
       true
-    when 'no'
+    when 'n'
       false
     else
       overwrite?
     end
   end
 
-  def choose_name
-    choose_name_text
+  def save_name
+    save_name_text
     display_saves
     name = "#{gets.chomp}.txt"
-    if valid_file?(name)
+    if no_repeat?(name)
       name
     elsif overwrite?
       name
     else
-      choose_name
+      save_name
     end
   end
 
-  def choose_file
-    choose_file_text
-    display_saves
-    name = "#{gets.chomp}.txt"
-    if valid_file?(name)
-      name
+  def valid_answer_save?(answer)
+    case answer
+    when 'y'
+      puts 'See you later!!'.blink
+      save
+      true
+    when 'n'
+      puts 'continuing...'
     else
-      puts 'INVALID FILE NAME'
-      choose_file
+      save_game?
     end
   end
 
-  def valid_file?(file)
+  def save_game?
+    puts 'Would you like to save? y/n'
+    ans = gets.chomp.downcase
+    true if valid_answer_save?(ans)
+  end
+
+  def no_repeat?(file)
     true unless current_saves.include?(file)
   end
 
@@ -140,12 +167,18 @@ module SaveGame
     print "\n"
   end
 
-  def load
-    load_file(choose_file)
-  end
-
-  def save
-    save_file(choose_name)
+  def load_save?
+    puts 'Would you like to load a save? y/n'
+    ans = gets.chomp
+    case ans
+    when 'y'
+      load
+      true
+    when 'n'
+      puts 'initializing...'
+    else
+      load_save?
+    end
   end
 end
 
@@ -183,14 +216,16 @@ class Game
             !@wrong_letters.include?(letter)
   end
 
-  def ask_letter
+  def ask_input
     input_please_text
-    letter = gets.chomp
-    if valid_letter?(letter)
-      letter
+    input = gets.chomp
+    if valid_letter?(input)
+      input
+    elsif input == 'save'
+      save_game?
     else
       invalid_text
-      ask_letter
+      ask_input
     end
   end
 
@@ -203,7 +238,7 @@ class Game
   end
 
   def play_round
-    guess_letter = ask_letter
+    guess_letter = ask_input
     @secret_word_array.each.with_index do |letter, index|
       if letter == guess_letter
         @guess_word_array[index] = letter
@@ -234,12 +269,12 @@ class Game
 
   def play_game
     until lose? || win?
-      play_round
       generate_board(@guess_word)
+      play_round
     end
   end
 end
 
 game = Game.new
-game.save
-# game = game.load
+game = game.load_save? if game.load_save?
+game.play_game
