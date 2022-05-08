@@ -261,5 +261,11 @@ class Game
 end
 
 game = Game.new
-# game = game.load_save
+game_data = game.load_save
+game = if game_data.nil?
+         Game.new
+       else
+         game_data
+       end
 game.play_game
+

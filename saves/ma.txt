@@ -7,9 +7,11 @@ secret_word_array:
 - e
 guess_word_array:
 - _
-- _
-- _
-- _
-guess_word: _ _ _ _
-guesses_left: 10
-wrong_letters: []
+- o
+- p
+- e
+guess_word: _ope
+guesses_left: 8
+wrong_letters:
+- b
+- l
