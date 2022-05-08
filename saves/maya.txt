@@ -1,23 +1,24 @@
 --- !ruby/object:Game
-secret_word: solving
+secret_word: churches
 secret_word_array:
+- c
+- h
+- u
+- r
+- c
+- h
+- e
 - s
-- o
-- l
-- v
-- i
-- n
-- g
 guess_word_array:
 - _
 - _
-- l
-- _
-- i
 - _
 - _
-guess_word: __l_i__
-guesses_left: 8
+- _
+- _
+- _
+- _
+guess_word: _ _ _ _ _ _ _ _
+guesses_left: 9
 wrong_letters:
-- e
-- j
+- true

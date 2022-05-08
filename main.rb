@@ -77,10 +77,6 @@ module SaveGame
     YAML.load(yaml)
   end
 
-  def load
-    load_file(load_name)
-  end
-
   def load_name
     load_name_text
     display_saves
@@ -100,25 +96,14 @@ module SaveGame
     SaveGame.deserialize(yaml)
   end
 
-  def save
-    save_file(save_name)
-  end
-
   def save_file(file_name)
     File.open("/home/justin/hangman/saves/#{file_name}", 'w') { |file| file.puts serialize }
   end
 
-  def overwrite?
-    overwrite_text
-    answer = gets.downcase.chomp
-    case answer
-    when 'y'
-      true
-    when 'n'
-      false
-    else
-      overwrite?
-    end
+  def save_game
+    save_file(save_name)
+    print "\n"
+    puts 'See you later!'.blink
   end
 
   def save_name
@@ -132,25 +117,6 @@ module SaveGame
     else
       save_name
     end
-  end
-
-  def valid_answer_save?(answer)
-    case answer
-    when 'y'
-      puts 'See you later!!'.blink
-      save
-      true
-    when 'n'
-      puts 'continuing...'
-    else
-      save_game?
-    end
-  end
-
-  def save_game?
-    puts 'Would you like to save? y/n'
-    ans = gets.chomp.downcase
-    true if valid_answer_save?(ans)
   end
 
   def no_repeat?(file)
@@ -167,17 +133,29 @@ module SaveGame
     print "\n"
   end
 
-  def load_save?
+  def overwrite?
+    overwrite_text
+    answer = gets.downcase.chomp
+    case answer
+    when 'y'
+      true
+    when 'n'
+      false
+    else
+      overwrite?
+    end
+  end
+
+  def load_save
     puts 'Would you like to load a save? y/n'
     ans = gets.chomp
     case ans
     when 'y'
-      load
-      true
+      load_file(load_name)
     when 'n'
       puts 'initializing...'
     else
-      load_save?
+      load_save
     end
   end
 end
@@ -187,8 +165,6 @@ class Game
   include Text
   include Board
   include SaveGame
-
-  attr_accessor :secret_word, :guess_word
 
   def initialize
     @secret_word = generate_word.chomp
@@ -216,19 +192,6 @@ class Game
             !@wrong_letters.include?(letter)
   end
 
-  def ask_input
-    input_please_text
-    input = gets.chomp
-    if valid_letter?(input)
-      input
-    elsif input == 'save'
-      save_game?
-    else
-      invalid_text
-      ask_input
-    end
-  end
-
   def no_match?(letter)
     true unless @secret_word_array.include?(letter)
   end
@@ -237,21 +200,41 @@ class Game
     @wrong_letters.push(letter) if no_match?(letter)
   end
 
-  def play_round
-    guess_letter = ask_input
+  def check_letter(guess_letter)
     @secret_word_array.each.with_index do |letter, index|
       if letter == guess_letter
         @guess_word_array[index] = letter
         @guess_word = @guess_word_array.join
       end
     end
+  end
+
+  def play_round(input)
+    return if input.nil?
+
+    guess_letter = input
+    check_letter(guess_letter)
     wrong_letters(guess_letter)
     lose_life(guess_letter)
+  end
+
+  def ask_input
+    input_please_text
+    input = gets.chomp
+    if valid_letter?(input)
+      input
+    elsif input == 'save'
+      save_game
+    else
+      invalid_text
+      ask_input
+    end
   end
 
   def win?
     return unless @guess_word == @secret_word
 
+    generate_board(@guess_word)
     winner_text
     true
   end
@@ -270,11 +253,13 @@ class Game
   def play_game
     until lose? || win?
       generate_board(@guess_word)
-      play_round
+      input = ask_input
+      play_round(input)
+      break if input.nil?
     end
   end
 end
 
 game = Game.new
-game = game.load_save? if game.load_save?
+# game = game.load_save
 game.play_game
